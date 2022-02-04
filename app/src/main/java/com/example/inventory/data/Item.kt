@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull
 data class Item(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
 
     @ColumnInfo(name = "name") @NotNull
     val itemName: String,
