@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import org.jetbrains.annotations.NotNull
+import java.text.NumberFormat
 
 @Entity(tableName = "item")
 data class Item(
@@ -20,3 +21,7 @@ data class Item(
     @ColumnInfo(name = "quantity") @NotNull
     val quantityInStock: Int
 )
+
+fun Item.getFormattedPrice(): String{
+    return NumberFormat.getCurrencyInstance().format(itemPrice)
+}

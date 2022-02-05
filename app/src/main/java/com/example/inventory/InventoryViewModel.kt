@@ -1,14 +1,16 @@
 package com.example.inventory
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.inventory.data.Item
 import com.example.inventory.data.ItemDao
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class InventoryViewModel(private val itemDao: ItemDao) : ViewModel(){
+
+    val allItems: LiveData<List<Item>> = itemDao.getAllItems().asLiveData()
+
 
     fun addNewItem(itemName: String, itemPrice: String, quantityInStock: String){
         val item = getNewItemEntry(itemName, itemPrice, quantityInStock)
@@ -20,6 +22,9 @@ class InventoryViewModel(private val itemDao: ItemDao) : ViewModel(){
             itemDao.insertItem(item)
         }
     }
+
+    fun getItemById(id: Int): LiveData<Item> = itemDao.getItemById(id).asLiveData()
+
 
     private fun getNewItemEntry(itemName: String, itemPrice: String, quantityInStock: String): Item {
         return Item(
