@@ -21,11 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.inventory.data.Item
 import com.example.inventory.databinding.FragmentAddItemBinding
 
 /**
@@ -39,7 +39,6 @@ class AddItemFragment : Fragment() {
         )
     }
 
-    lateinit var item: Item
 
     private val navigationArgs: ItemDetailFragmentArgs by navArgs()
 
@@ -80,9 +79,15 @@ class AddItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.saveAction.setOnClickListener {
-            addNewItem()
+        if(navigationArgs.itemId != -1){
+            bind()
+            binding.saveAction.setOnClickListener {
+                updateItem()
+            }
+        } else {
+            binding.saveAction.setOnClickListener {
+                addNewItem()
+            }
         }
     }
 
@@ -96,5 +101,26 @@ class AddItemFragment : Fragment() {
                 InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
         _binding = null
+    }
+
+    private fun bind(){
+        viewModel.getItemById(navigationArgs.itemId).observe(viewLifecycleOwner) {
+            binding.itemName.setText(it.itemName.toString(), TextView.BufferType.SPANNABLE)
+            binding.itemCount.setText(it.quantityInStock.toString(), TextView.BufferType.SPANNABLE)
+            binding.itemPrice.setText("%.2f".format(it.itemPrice), TextView.BufferType.SPANNABLE)
+            }
+    }
+
+    private fun updateItem(){
+        if(isEntryValid()){
+            viewModel.updatedItem(
+                navigationArgs.itemId,
+                binding.itemName.text.toString(),
+                binding.itemPrice.text.toString(),
+                binding.itemCount.text.toString()
+            )
+            val action = AddItemFragmentDirections.actionAddItemFragmentToItemListFragment()
+            findNavController().navigate(action)
+        }
     }
 }
